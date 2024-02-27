@@ -8,6 +8,7 @@ function osci3d:initialize(sel, atoms)
   self.STROKE_WIDTH = 1
   self.ZOOM = 1
   self.COLOR = {Colors.foreground}
+  self.BACKGROUND = {Colors.background}
 
   self.PERSPECTIVE = 1
 
@@ -76,7 +77,7 @@ function osci3d:perform(in1, in2, in3)
 end
 
 function osci3d:paint(g)
-  g.set_color(Colors.background)
+  g.set_color(table.unpack(self.BACKGROUND))
   g.fill_all()
 
   -- draw ground grid
@@ -181,4 +182,8 @@ end
 
 function osci3d:in_4_color(x)
   self.COLOR = {x[1], x[2], x[3]}
+end
+
+function osci3d:in_4_background(x)
+  self.BACKGROUND = {x[1], x[2], x[3]}
 end
