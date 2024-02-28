@@ -2,6 +2,7 @@ local osci3d = pd.Class:new():register("osci3d~")
 
 function osci3d:initialize(sel, atoms)
   self.SIZE = type(atoms[1]) == "number" and atoms[1] or 480
+  self.FRAMEINTERVAL = self:interval_from_fps(50)
   self.inlets = {SIGNAL, SIGNAL, SIGNAL, DATA}
   self:reset()
   self.signalIndex = 1
@@ -11,6 +12,10 @@ function osci3d:initialize(sel, atoms)
   self.gui = 1
   self:set_size(self.SIZE, self.SIZE)
   return true
+end
+
+function osci3d:interval_from_fps(fps)
+  return 1 / fps * 1000
 end
 
 function osci3d:reset()
@@ -30,7 +35,7 @@ end
 function osci3d:reset_buffer()
   self.signal = {}
   self.rotatedSignal = {}
-  -- fill ring buffer
+  -- prefill ring buffer
   for i = 1, self.BUFFERSIZE do 
     self.signal[i] = {0, 0, 0}
     self.rotatedSignal[i] = {0, 0, 0}
@@ -39,7 +44,7 @@ end
 
 function osci3d:postinitialize()
   self.clock = pd.Clock:new():register(self, "tick")
-  self.clock:delay(20)
+  self.clock:delay(self.FRAMEINTERVAL)
 end
 
 function osci3d:finalize()
@@ -48,7 +53,7 @@ end
 
 function osci3d:tick()
   self:repaint()
-  self.clock:delay(20)
+  self.clock:delay(self.FRAMEINTERVAL)
 end
 
 function osci3d:createGrid(minVal, maxVal, step)
@@ -182,6 +187,12 @@ end
 
 function osci3d:in_4_reset()
   self:reset()
+end
+
+function osci3d:in_4_framerate(x)
+  if type(x[1]) == "number" then
+    self.FRAMEINTERVAL = self:interval_from_fps(math.min(120, math.max(1, x[1])))
+  end
 end
 
 function osci3d:in_4_color(x)
