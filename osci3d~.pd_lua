@@ -5,9 +5,9 @@ function osci3d:initialize(sel, atoms)
   self.inlets = {SIGNAL, SIGNAL, SIGNAL, DATA}
   self:reset()
   self.signalIndex = 1
-  self.rotationStartAngleX, self.rotationStartAngleY = 0, 0
   self.cameraDistance = 6
   self.gridLines = self:createGrid(-2, 2, 0.5)
+
   self.gui = 1
   self:set_size(self.SIZE, self.SIZE)
   return true
@@ -24,6 +24,7 @@ function osci3d:reset()
   self.BACKGROUND = {Colors.background}
   self.PERSPECTIVE = 1
   self.rotationAngleX, self.rotationAngleY = 0, 0
+  self.rotationStartAngleX, self.rotationStartAngleY = 0, 0
 end
 
 function osci3d:postinitialize()
