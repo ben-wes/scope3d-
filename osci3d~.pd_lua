@@ -1,35 +1,29 @@
 local osci3d = pd.Class:new():register("osci3d~")
 
 function osci3d:initialize(sel, atoms)
-  self.BUFFERSIZE = 512
-  self.SAMPLING_INTERVAL = 8
-  self.DRAW_GRID = 1
   self.SIZE = type(atoms[1]) == "number" and atoms[1] or 480
-  self.STROKE_WIDTH = 1
-  self.ZOOM = 1
-  self.COLOR = {Colors.foreground}
-  self.BACKGROUND = {Colors.background}
-
-  self.PERSPECTIVE = 1
-
   self.inlets = {SIGNAL, SIGNAL, SIGNAL, DATA}
-  self.outlets = 0
-  self.signal = {}
-  self.rotatedSignal = {}
-  -- fill ring buffer
-  for i = 1, self.BUFFERSIZE do 
-    self.signal[i] = {0, 0, 0}
-    self.rotatedSignal[i] = {0, 0, 0}
-  end
+  self:reset()
   self.signalIndex = 1
-  self.dragStartX, self.dragStartY = 0, 0
-  self.rotationAngleX, self.rotationAngleY = 0, 0
   self.rotationStartAngleX, self.rotationStartAngleY = 0, 0
   self.cameraDistance = 6
   self.gridLines = self:createGrid(-2, 2, 0.5)
   self.gui = 1
   self:set_size(self.SIZE, self.SIZE)
   return true
+end
+
+function osci3d:reset()
+  self.BUFFERSIZE = 512
+  self:set_buffer()
+  self.SAMPLING_INTERVAL = 8
+  self.DRAW_GRID = 1
+  self.STROKE_WIDTH = 1
+  self.ZOOM = 1
+  self.COLOR = {Colors.foreground}
+  self.BACKGROUND = {Colors.background}
+  self.PERSPECTIVE = 1
+  self.rotationAngleX, self.rotationAngleY = 0, 0
 end
 
 function osci3d:postinitialize()
@@ -139,6 +133,16 @@ function osci3d:projectVertex(vertex)
   return screenX, screenY
 end
 
+function osci3d:set_buffer()
+  self.signal = {}
+  self.rotatedSignal = {}
+  -- fill ring buffer
+  for i = 1, self.BUFFERSIZE do 
+    self.signal[i] = {0, 0, 0}
+    self.rotatedSignal[i] = {0, 0, 0}
+  end
+end
+
 function osci3d:in_4_zoom(x)
   self.ZOOM = x[1]
 end
@@ -154,12 +158,7 @@ end
 
 function osci3d:in_4_buffer(x)
   self.BUFFERSIZE = math.max(2, math.floor(x[1]))
-  self.signal = {}
-  self.rotatedSignal = {}
-  for i = 1, self.BUFFERSIZE do 
-    self.signal[i] = {0, 0, 0}
-    self.rotatedSignal[i] = {0, 0, 0}
-  end
+  self:set_buffer()
 end
 
 function osci3d:in_4_interval(x)
@@ -175,9 +174,7 @@ function osci3d:in_4_perspective(x)
 end
 
 function osci3d:in_4_reset()
-  self.rotationAngleX, self.rotationAngleY = 0, 0
-  self.COLOR = {Colors.foreground}
-  self.ZOOM = 1
+  self:reset()
 end
 
 function osci3d:in_4_color(x)
