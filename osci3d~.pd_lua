@@ -15,7 +15,7 @@ end
 
 function osci3d:reset()
   self.BUFFERSIZE = 512
-  self:set_buffer()
+  self:reset_buffer()
   self.SAMPLING_INTERVAL = 8
   self.DRAW_GRID = 1
   self.STROKE_WIDTH = 1
@@ -25,6 +25,16 @@ function osci3d:reset()
   self.PERSPECTIVE = 1
   self.rotationAngleX, self.rotationAngleY = 0, 0
   self.rotationStartAngleX, self.rotationStartAngleY = 0, 0
+end
+
+function osci3d:reset_buffer()
+  self.signal = {}
+  self.rotatedSignal = {}
+  -- fill ring buffer
+  for i = 1, self.BUFFERSIZE do 
+    self.signal[i] = {0, 0, 0}
+    self.rotatedSignal[i] = {0, 0, 0}
+  end
 end
 
 function osci3d:postinitialize()
@@ -134,44 +144,40 @@ function osci3d:projectVertex(vertex)
   return screenX, screenY
 end
 
-function osci3d:set_buffer()
-  self.signal = {}
-  self.rotatedSignal = {}
-  -- fill ring buffer
-  for i = 1, self.BUFFERSIZE do 
-    self.signal[i] = {0, 0, 0}
-    self.rotatedSignal[i] = {0, 0, 0}
-  end
-end
-
 function osci3d:in_4_zoom(x)
-  self.ZOOM = x[1]
+  self.ZOOM = type(x[1]) == "number" and x[1] or 1
 end
 
 function osci3d:in_4_grid(x)
-  self.DRAW_GRID = x[1]
+  self.DRAW_GRID = type(x[1]) == "number" and x[1] or 1 - self.DRAW_GRID
 end
 
 function osci3d:in_4_resize(x)
-  self.SIZE = math.max(64, x[1])
-  self:set_size(self.SIZE, self.SIZE)
+  if type(x[1]) == "number" then
+    self.SIZE = math.max(64, x[1])
+    self:set_size(self.SIZE, self.SIZE)
+  end
 end
 
 function osci3d:in_4_buffer(x)
-  self.BUFFERSIZE = math.max(2, math.floor(x[1]))
-  self:set_buffer()
+  if type(x[1]) == "number" then
+    self.BUFFERSIZE = math.min(1024, math.max(2, math.floor(x[1])))
+    self:reset_buffer()
+  end
 end
 
 function osci3d:in_4_interval(x)
-  self.SAMPLING_INTERVAL = math.max(1, math.floor(x[1]))
+  if type(x[1]) == "number" then
+    self.SAMPLING_INTERVAL = math.max(1, math.floor(x[1]))
+  end
 end
 
 function osci3d:in_4_stroke(x)
-  self.STROKE_WIDTH = math.max(1, x[1])
+  self.STROKE_WIDTH = type(x[1]) == "number" and math.max(1, x[1]) or 1
 end
 
 function osci3d:in_4_perspective(x)
-  self.PERSPECTIVE = x[1]
+  self.PERSPECTIVE = type(x[1]) == "number" and x[1] or 1
 end
 
 function osci3d:in_4_reset()
@@ -179,9 +185,19 @@ function osci3d:in_4_reset()
 end
 
 function osci3d:in_4_color(x)
-  self.COLOR = {x[1], x[2], x[3]}
+  if type(x) == "table" and #x == 3 and
+     type(x[1]) == "number" and
+     type(x[2]) == "number" and
+     type(x[3]) == "number" then
+    self.COLOR = {x[1], x[2], x[3]}
+  end
 end
 
 function osci3d:in_4_background(x)
-  self.BACKGROUND = {x[1], x[2], x[3]}
+  if type(x) == "table" and #x == 3 and
+     type(x[1]) == "number" and
+     type(x[2]) == "number" and
+     type(x[3]) == "number" then
+    self.BACKGROUND = {x[1], x[2], x[3]}
+  end
 end
