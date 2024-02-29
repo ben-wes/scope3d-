@@ -5,7 +5,6 @@ function osci3d:initialize(sel, atoms)
   self.FRAMEINTERVAL = self:interval_from_fps(50)
   self.inlets = {SIGNAL, SIGNAL, SIGNAL, DATA}
   self:reset()
-  self.signalIndex = 1
   self.cameraDistance = 6
   self.gridLines = self:createGrid(-2, 2, 0.5)
 
@@ -19,6 +18,8 @@ end
 
 function osci3d:reset()
   self.BUFFERSIZE = 512
+  self.bufferIndex = 1
+  self.sampleIndex = 1
   self:reset_buffer()
   self.SAMPLING_INTERVAL = 8
   self.DRAW_GRID = 1
@@ -78,11 +79,14 @@ function osci3d:mouse_drag(x, y)
 end
 
 function osci3d:perform(in1, in2, in3)
-  for i = 1, #in1, self.SAMPLING_INTERVAL do
+  local blocksize = #in1
+  while self.sampleIndex <= blocksize do
     -- circular buffer
-    self.signal[self.signalIndex] = {in1[i], in2[i], in3[i]}
-    self.signalIndex = (self.signalIndex % self.BUFFERSIZE) + 1
+    self.signal[self.bufferIndex] = {in1[self.sampleIndex], in2[self.sampleIndex], in3[self.sampleIndex]}
+    self.bufferIndex = (self.bufferIndex % self.BUFFERSIZE) + 1
+    self.sampleIndex = self.sampleIndex + self.SAMPLING_INTERVAL
   end
+  self.sampleIndex = self.sampleIndex - blocksize
 end
 
 function osci3d:paint(g)
@@ -110,7 +114,7 @@ function osci3d:paint(g)
   end
 
   for i = 1, self.BUFFERSIZE do
-    local offsetIndex = (i + self.signalIndex-2) % self.BUFFERSIZE + 1
+    local offsetIndex = (i + self.bufferIndex-2) % self.BUFFERSIZE + 1
     local rotatedVertex = self:rotateY(self.signal[offsetIndex], self.rotationAngleY)
     self.rotatedSignal[i] = self:rotateX(rotatedVertex, self.rotationAngleX)
   end
