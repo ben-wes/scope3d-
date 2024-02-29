@@ -9,7 +9,6 @@ function osci3d:initialize(sel, atoms)
   self.cameraDistance = 6
   self.gridLines = self:createGrid(-2, 2, 0.5)
 
-  self.gui = 1
   self:set_size(self.SIZE, self.SIZE)
   return true
 end
