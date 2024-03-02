@@ -74,8 +74,8 @@ function scope3d:mouse_up(x, y)
 end
 
 function scope3d:mouse_drag(x, y)
-  self.rotationAngleY = self.rotationStartAngleY + ((x-self.dragStartX) / 50)
-  self.rotationAngleX = self.rotationStartAngleX - ((y-self.dragStartY) / 50)
+  self.rotationAngleY = self.rotationStartAngleY + ((x-self.dragStartX) / 2)
+  self.rotationAngleX = self.rotationStartAngleX - ((y-self.dragStartY) / 2)
 end
 
 function scope3d:perform(in1, in2, in3)
@@ -129,8 +129,8 @@ end
 
 function scope3d:rotateY(vertex, angle)
   local x, y, z = table.unpack(vertex)
-  local cosTheta = math.cos(angle)
-  local sinTheta = math.sin(angle)
+  local cosTheta = math.cos(angle * math.pi / 180)
+  local sinTheta = math.sin(angle * math.pi / 180)
   local newX = x * cosTheta - z * sinTheta
   local newZ = x * sinTheta + z * cosTheta
   return {newX, y, newZ}
@@ -138,8 +138,8 @@ end
 
 function scope3d:rotateX(vertex, angle)
   local x, y, z = table.unpack(vertex)
-  local cosTheta = math.cos(angle)
-  local sinTheta = math.sin(angle)
+  local cosTheta = math.cos(angle * math.pi / 180)
+  local sinTheta = math.sin(angle * math.pi / 180)
   local newY = y * cosTheta - z * sinTheta
   local newZ = y * sinTheta + z * cosTheta
   return {x, newY, newZ}
@@ -150,6 +150,26 @@ function scope3d:projectVertex(vertex)
   local screenX = self.SIZE / 2 + (vertex[1] * scale * self.ZOOM * self.SIZE * 0.5)
   local screenY = self.SIZE / 2 - (vertex[2] * scale * self.ZOOM * self.SIZE * 0.5)
   return screenX, screenY
+end
+
+function scope3d:in_4_rotatex(x)
+  if type(x[1]) == "number" then
+    self.rotationAngleX = x[1]
+  end
+end
+
+function scope3d:in_4_rotatey(x)
+  if type(x[1]) == "number" then
+    self.rotationAngleY = x[1]
+  end
+end
+
+function scope3d:in_4_rotate(x)
+  if type(x) == "table" and #x == 2 and
+     type(x[1]) == "number" and
+     type(x[2]) == "number" then
+    self.rotationAngleX, self.rotationAngleY = x[1], x[2]
+  end
 end
 
 function scope3d:in_4_zoom(x)
