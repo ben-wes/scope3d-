@@ -6,7 +6,7 @@ function scope3d:initialize(sel, atoms)
   self.inlets = {SIGNAL, SIGNAL, SIGNAL, DATA}
   self:reset()
   self.cameraDistance = 6
-  self.gridLines = self:createGrid(-1, 1, 0.25)
+  self.gridLines = self:create_grid(-1, 1, 0.25)
 
   self:set_size(self.SIZE, self.SIZE)
   return true
@@ -56,7 +56,7 @@ function scope3d:tick()
   self.clock:delay(self.FRAMEINTERVAL)
 end
 
-function scope3d:createGrid(minVal, maxVal, step)
+function scope3d:create_grid(minVal, maxVal, step)
   local grid = {}
   for i = minVal, maxVal, step do
     table.insert(grid, {{i, 0, minVal}, {i, 0, maxVal}})
@@ -103,10 +103,10 @@ function scope3d:paint(g)
       local lineFrom, lineTo = table.unpack(self.gridLines[i])
       
       -- apply rotation to grid lines
-      lineFrom = self:rotateY(lineFrom, self.rotationAngleY)
-      lineFrom = self:rotateX(lineFrom, self.rotationAngleX)
-      lineTo   = self:rotateY(lineTo  , self.rotationAngleY)
-      lineTo   = self:rotateX(lineTo  , self.rotationAngleX)
+      lineFrom = self:rotate_y(lineFrom, self.rotationAngleY)
+      lineFrom = self:rotate_x(lineFrom, self.rotationAngleX)
+      lineTo   = self:rotate_y(lineTo  , self.rotationAngleY)
+      lineTo   = self:rotate_x(lineTo  , self.rotationAngleX)
 
       local startX, startY = self:projectVertex(lineFrom, self.ZOOM)
       local   endX,   endY = self:projectVertex(  lineTo, self.ZOOM)
@@ -118,8 +118,8 @@ function scope3d:paint(g)
 
   for i = 1, self.BUFFERSIZE do
     local offsetIndex = (i + self.bufferIndex-2) % self.BUFFERSIZE + 1
-    local rotatedVertex = self:rotateY(self.signal[offsetIndex], self.rotationAngleY)
-    self.rotatedSignal[i] = self:rotateX(rotatedVertex, self.rotationAngleX)
+    local rotatedVertex = self:rotate_y(self.signal[offsetIndex], self.rotationAngleY)
+    self.rotatedSignal[i] = self:rotate_x(rotatedVertex, self.rotationAngleX)
   end
 
   g.set_color(table.unpack(self.COLOR))
@@ -130,7 +130,7 @@ function scope3d:paint(g)
   g.stroke_path(p, self.STROKE_WIDTH)
 end
 
-function scope3d:rotateY(vertex, angle)
+function scope3d:rotate_y(vertex, angle)
   local x, y, z = table.unpack(vertex)
   local cosTheta = math.cos(angle * math.pi / 180)
   local sinTheta = math.sin(angle * math.pi / 180)
@@ -139,7 +139,7 @@ function scope3d:rotateY(vertex, angle)
   return {newX, y, newZ}
 end
 
-function scope3d:rotateX(vertex, angle)
+function scope3d:rotate_x(vertex, angle)
   local x, y, z = table.unpack(vertex)
   local cosTheta = math.cos(angle * math.pi / 180)
   local sinTheta = math.sin(angle * math.pi / 180)
