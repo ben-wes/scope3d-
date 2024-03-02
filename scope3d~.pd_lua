@@ -78,15 +78,18 @@ function scope3d:mouse_drag(x, y)
   self.rotationAngleX = self.rotationStartAngleX - ((y-self.dragStartY) / 2)
 end
 
+function scope3d:dsp(samplerate, blocksize)
+    self.blocksize = blocksize
+end
+
 function scope3d:perform(in1, in2, in3)
-  local blocksize = #in1
-  while self.sampleIndex <= blocksize do
+  while self.sampleIndex <= self.blocksize do
     -- circular buffer
     self.signal[self.bufferIndex] = {in1[self.sampleIndex], in2[self.sampleIndex], in3[self.sampleIndex]}
     self.bufferIndex = (self.bufferIndex % self.BUFFERSIZE) + 1
     self.sampleIndex = self.sampleIndex + self.SAMPLING_INTERVAL
   end
-  self.sampleIndex = self.sampleIndex - blocksize
+  self.sampleIndex = self.sampleIndex - self.blocksize
 end
 
 function scope3d:paint(g)
