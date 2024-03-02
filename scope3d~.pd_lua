@@ -1,7 +1,7 @@
 local scope3d = pd.Class:new():register("scope3d~")
 
 function scope3d:initialize(sel, atoms)
-  self.SIZE = type(atoms[1]) == "number" and atoms[1] or 480
+  self.SIZE = type(atoms[1]) == "number" and atoms[1] or 140
   self.FRAMEINTERVAL = self:interval_from_fps(50)
   self.inlets = {SIGNAL, SIGNAL, SIGNAL, DATA}
   self:reset()
@@ -160,7 +160,7 @@ function scope3d:in_4_grid(x)
   self.DRAW_GRID = type(x[1]) == "number" and x[1] or 1 - self.DRAW_GRID
 end
 
-function scope3d:in_4_resize(x)
+function scope3d:in_4_size(x)
   if type(x[1]) == "number" then
     self.SIZE = math.max(64, x[1])
     self:set_size(self.SIZE, self.SIZE)
