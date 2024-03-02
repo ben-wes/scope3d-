@@ -6,7 +6,7 @@ function scope3d:initialize(sel, atoms)
   self.inlets = {SIGNAL, SIGNAL, SIGNAL, DATA}
   self:reset()
   self.cameraDistance = 6
-  self.gridLines = self:createGrid(-2, 2, 0.5)
+  self.gridLines = self:createGrid(-1, 1, 0.25)
 
   self:set_size(self.SIZE, self.SIZE)
   return true
@@ -147,8 +147,8 @@ end
 
 function scope3d:projectVertex(vertex)
   local scale = self.cameraDistance / (self.cameraDistance + vertex[3] * self.PERSPECTIVE)
-  local screenX = self.SIZE / 2 + (vertex[1] * scale * self.ZOOM * self.SIZE * 0.25)
-  local screenY = self.SIZE / 2 - (vertex[2] * scale * self.ZOOM * self.SIZE * 0.25)
+  local screenX = self.SIZE / 2 + (vertex[1] * scale * self.ZOOM * self.SIZE * 0.5)
+  local screenY = self.SIZE / 2 - (vertex[2] * scale * self.ZOOM * self.SIZE * 0.5)
   return screenX, screenY
 end
 
