@@ -1,14 +1,15 @@
 local scope3d = pd.Class:new():register("scope3d~")
 
 function scope3d:initialize(sel, atoms)
-  self.SIZE = type(atoms[1]) == "number" and atoms[1] or 140
+  self.WIDTH = type(atoms[1]) == "number" and atoms[1] or 140
+  self.HEIGHT = type(atoms[2]) == "number" and atoms[2] or self.WIDTH
   self.FRAMEINTERVAL = self:interval_from_fps(50)
   self.inlets = {SIGNAL, SIGNAL, SIGNAL, DATA}
   self:reset()
   self.cameraDistance = 6
   self.gridLines = self:create_grid(-1, 1, 0.25)
 
-  self:set_size(self.SIZE, self.SIZE)
+  self:set_size(self.WIDTH, self.HEIGHT)
   return true
 end
 
@@ -149,9 +150,10 @@ function scope3d:rotate_x(vertex, angle)
 end
 
 function scope3d:projectVertex(vertex)
+  local minDim = math.min(self.WIDTH, self.HEIGHT)
   local scale = self.cameraDistance / (self.cameraDistance + vertex[3] * self.PERSPECTIVE)
-  local screenX = self.SIZE / 2 + (vertex[1] * scale * self.ZOOM * self.SIZE * 0.5)
-  local screenY = self.SIZE / 2 - (vertex[2] * scale * self.ZOOM * self.SIZE * 0.5)
+  local screenX = self.WIDTH / 2 + (vertex[1] * scale * self.ZOOM * minDim * 0.5)
+  local screenY = self.HEIGHT / 2 - (vertex[2] * scale * self.ZOOM * minDim * 0.5)
   return screenX, screenY
 end
 
@@ -185,8 +187,24 @@ end
 
 function scope3d:in_4_size(x)
   if type(x[1]) == "number" then
-    self.SIZE = math.max(64, x[1])
-    self:set_size(self.SIZE, self.SIZE)
+    local size = math.max(1, x[1])
+    self.WIDTH = size
+    self.HEIGHT = size
+    self:set_size(self.WIDTH, self.HEIGHT)
+  end
+end
+
+function scope3d:in_4_width(x)
+  if type(x[1]) == "number" then
+    self.WIDTH = math.max(1, x[1])
+    self:set_size(self.WIDTH, self.HEIGHT)
+  end
+end
+
+function scope3d:in_4_height(x)
+  if type(x[1]) == "number" then
+    self.HEIGHT = math.max(1, x[1])
+    self:set_size(self.WIDTH, self.HEIGHT)
   end
 end
 
