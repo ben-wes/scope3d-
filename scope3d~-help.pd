@@ -27,7 +27,7 @@
 #X obj 684 303 hsl 136 16 0 360 0 0 empty empty empty -2 -10 0 12 #fcfcfc #000000 #000000 0 1;
 #X msg 682 188 rotate \$2 \$1;
 #X floatatom 681 324 5 0 0 0 - - - 0;
-#X obj 70 248 scope3d~ 200 -xrotate 20 -yrotate 20 -zoom 1.2;
+#X obj 70 248 scope3d~ -size 200 -xrotate 20 -yrotate 20 -zoom 1.2;
 #X floatatom 681 246 5 0 0 0 - - - 0;
 #X listbox 682 167 20 0 0 0 - - - 0;
 #X msg 494 466 size \$1;
@@ -45,8 +45,6 @@
 #X msg 340 114 bgcolor 0 30 60;
 #X msg 340 193 gridcolor 64;
 #X msg 340 77 fgcolor 192;
-#X text 66 461 initialized with [scope3d~ 200 -xrotate 20 -yrotate 20 -zoom 1.2], f 65;
-#X text 66 481 all messages can be set as argument with additional "-". first two float arguments without a key will set size (or width and height if 2 arguments given), f 56;
 #X msg 681 266 xrotate \$1;
 #X msg 681 344 xrotate \$1;
 #X obj 682 35 slider2d 127 127 -180 180 -90 90 1 255 255 255 0 0 0 0 0 0 -75.1181 -46.063 empty empty;
@@ -55,6 +53,8 @@
 #X obj 70 227 osc~ 80;
 #X obj 134 227 osc~ 40.1;
 #X obj 198 227 osc~ 120;
+#X text 66 461 [scope3d~ -size 200 -xrotate 20 -yrotate 20 -zoom 1.2], f 69;
+#X text 66 481 all messages can be set as argument with additional "-", f 61;
 #X connect 0 0 27 3;
 #X connect 1 0 0 0;
 #X connect 2 0 3 0;
@@ -81,8 +81,8 @@
 #X connect 23 0 28 0;
 #X connect 24 0 26 0;
 #X connect 25 0 27 3;
-#X connect 26 0 48 0;
-#X connect 28 0 47 0;
+#X connect 26 0 46 0;
+#X connect 28 0 45 0;
 #X connect 29 0 25 0;
 #X connect 30 0 27 3;
 #X connect 31 0 33 0;
@@ -98,11 +98,11 @@
 #X connect 42 0 27 3;
 #X connect 43 0 27 3;
 #X connect 44 0 27 3;
-#X connect 47 0 27 3;
-#X connect 48 0 27 3;
-#X connect 49 0 29 0;
-#X connect 50 0 51 0;
-#X connect 51 0 27 3;
-#X connect 52 0 27 0;
-#X connect 53 0 27 1;
-#X connect 54 0 27 2;
+#X connect 45 0 27 3;
+#X connect 46 0 27 3;
+#X connect 47 0 29 0;
+#X connect 48 0 49 0;
+#X connect 49 0 27 3;
+#X connect 50 0 27 0;
+#X connect 51 0 27 1;
+#X connect 52 0 27 2;

@@ -6,13 +6,12 @@ function scope3d:initialize(sel, atoms)
   self.cameraDistance = 6
   self.gridLines = self:create_grid(-1, 1, 0.25)
 
-  local kwargs, args = self:handle_args(atoms)
-  self.WIDTH = type(args[1]) == "number" and args[1] or 140
-  self.HEIGHT = type(args[2]) == "number" and args[2] or self.WIDTH
-  self:set_size(self.WIDTH, self.HEIGHT)
+  self.WIDTH, self.HEIGHT = 140, 140
+  local kwargs, _ = self:handle_args(atoms)
   for k, v in pairs(kwargs) do
     self:call_pd_method(k, v)
   end
+  self:set_size(self.WIDTH, self.HEIGHT)
   return true
 end
 
@@ -257,10 +256,14 @@ function scope3d:pd_grid(x)
 end
 
 function scope3d:pd_size(x)
-  if type(x[1]) == "number" then
-    local size = math.max(1, x[1])
-    self.WIDTH = size
-    self.HEIGHT = size
+  if #x == 1 then x = {x[1], x[1]} end
+  if #x == 2 and
+     type(x[1]) == "number" and
+     type(x[2]) == "number" then
+    local width = math.max(1, x[1])
+    local height = math.max(1, x[2])
+    self.WIDTH = width
+    self.HEIGHT = height
     self:set_size(self.WIDTH, self.HEIGHT)
   end
 end
