@@ -124,12 +124,12 @@ function scope3d:perform(in1, in2, in3)
 end
 
 function scope3d:paint(g)
-  g.set_color(table.unpack(self.BGCOLOR))
-  g.fill_all()
+  g:set_color(table.unpack(self.BGCOLOR))
+  g:fill_all()
 
   -- draw ground grid
   if self.DRAW_GRID == 1 then
-    g.set_color(table.unpack(self.GRIDCOLOR))
+    g:set_color(table.unpack(self.GRIDCOLOR))
     for i = 1, #self.gridLines do
       local lineFrom, lineTo = table.unpack(self.gridLines[i])
       
@@ -142,7 +142,7 @@ function scope3d:paint(g)
       local startX, startY = self:projectVertex(lineFrom, self.ZOOM)
       local   endX,   endY = self:projectVertex(  lineTo, self.ZOOM)
       if lineFrom[3] > -self.cameraDistance and lineTo[3] > -self.cameraDistance then
-        g.draw_line(startX, startY, endX, endY, 1)
+        g:draw_line(startX, startY, endX, endY, 1)
       end
     end
   end
@@ -153,12 +153,12 @@ function scope3d:paint(g)
     self.rotatedSignal[i] = self:rotate_x(rotatedVertex, self.rotationAngleX)
   end
 
-  g.set_color(table.unpack(self.FGCOLOR))
+  g:set_color(table.unpack(self.FGCOLOR))
   local p = path.start(self:projectVertex(self.rotatedSignal[1], self.ZOOM))
   for i = 2, self.BUFFERSIZE do
     p:line_to(self:projectVertex(self.rotatedSignal[i], self.ZOOM))
   end
-  g.stroke_path(p, self.STROKE_WIDTH)
+  g:stroke_path(p, self.STROKE_WIDTH)
 end
 
 function scope3d:rotate_y(vertex, angle)
