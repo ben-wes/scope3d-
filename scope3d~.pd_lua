@@ -1,20 +1,44 @@
 local scope3d = pd.Class:new():register("scope3d~")
 
 function scope3d:initialize(sel, atoms)
-  self.WIDTH = type(atoms[1]) == "number" and atoms[1] or 140
-  self.HEIGHT = type(atoms[2]) == "number" and atoms[2] or self.WIDTH
   self.FRAMEINTERVAL = self:interval_from_fps(50)
   self.inlets = {SIGNAL, SIGNAL, SIGNAL, DATA}
   self:reset()
   self.cameraDistance = 6
   self.gridLines = self:create_grid(-1, 1, 0.25)
 
+  local kwargs, args = self:handle_args(atoms)
+  self.WIDTH = type(args[1]) == "number" and args[1] or 140
+  self.HEIGHT = type(args[2]) == "number" and args[2] or self.WIDTH
   self:set_size(self.WIDTH, self.HEIGHT)
+  for k, v in pairs(kwargs) do
+    self:call_pd_method(k, v)
+  end
   return true
 end
 
 function scope3d:interval_from_fps(fps)
   return 1 / fps * 1000
+end
+
+function scope3d:handle_args(atoms)
+  local kwargs = {}
+  local args = {}
+  local collectKey = nil
+  for _, atom in ipairs(atoms) do
+    if type(atom) ~= "number" and string.sub(atom, 1, 1) == "-" then
+      -- start collecting values for a new key if key detected
+      collectKey = string.sub(atom, 2)
+      kwargs[collectKey] = {}
+    elseif collectKey then
+      -- if currently collecting values for a key, add this atom to that key's table
+      table.insert(kwargs[collectKey], atom)
+    else
+      -- otherwise treat as a positional argument
+      table.insert(args, atom)
+    end
+  end
+  return kwargs, args
 end
 
 function scope3d:reset()
@@ -159,6 +183,10 @@ function scope3d:projectVertex(vertex)
 end
 
 function scope3d:in_n(n, sel, atoms)
+  self:call_pd_method(sel, atoms)
+end
+
+function scope3d:call_pd_method(sel, atoms)
   local methods =
   {
     rotate      = function(s, a) return s:pd_rotate(a)      end,
@@ -192,7 +220,7 @@ end
 
 function scope3d:pd_xrotate(x)
   if type(x[1]) == "number" then
-    self.rotationAngleX = x[1]
+    self.rotationAngleX = -x[1]
   end
 end
 
