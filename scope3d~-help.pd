@@ -1,7 +1,7 @@
-#N struct 3416-point float x0 float y0 float xs float ys float fg float in float gridx float gridy;
-#N canvas 357 43 896 694 10;
-#X msg 330 175 grid \$1;
-#X obj 330 151 tgl 19 1 empty empty empty 0 -10 0 12 #fcfcfc #000000 #000000 1 1;
+#N struct 1005-point float x0 float y0 float xs float ys float fg float in float gridx float gridy;
+#N canvas 357 43 905 694 10;
+#X msg 195 55 grid \$1;
+#X obj 195 34 tgl 16 1 empty empty empty 0 -10 0 12 #fcfcfc #000000 #000000 1 1;
 #X obj 497 35 hsl 136 16 0.1 10 1 0 empty empty empty -2 -10 0 12 #fcfcfc #000000 #000000 0 1;
 #X floatatom 494 56 5 0 0 0 - - - 0;
 #X obj 497 113 hsl 136 16 1 64 1 0 empty empty empty -2 -10 0 12 #fcfcfc #000000 #000000 0 1;
@@ -45,10 +45,13 @@
 #X text 66 591 initialized with [scope3d~ 200] \, optional argument for size (or width and height if 2 arguments given), f 36;
 #X obj 134 87 setdsp~;
 #X obj 682 35 slider2d 127 127 0 127 0 127 1 255 255 255 0 0 0 0 0 0 127 59 empty empty;
-#X msg 330 35 fgcolor 0 60 120;
-#X msg 330 56 fgcolor 180 255 0;
-#X msg 330 93 bgcolor 32 32 32;
-#X msg 330 114 gridcolor 255 64 0;
+#X msg 340 35 fgcolor 0 60 120;
+#X msg 340 56 fgcolor 180 255 0;
+#X msg 340 172 gridcolor 255 64 0;
+#X msg 340 135 bgcolor 32;
+#X msg 340 114 bgcolor 0 30 60;
+#X msg 340 193 gridcolor 64;
+#X msg 340 77 fgcolor 192;
 #X connect 0 0 32 3;
 #X connect 1 0 0 0;
 #X connect 2 0 3 0;
@@ -95,3 +98,6 @@
 #X connect 46 0 32 3;
 #X connect 47 0 32 3;
 #X connect 48 0 32 3;
+#X connect 49 0 32 3;
+#X connect 50 0 32 3;
+#X connect 51 0 32 3;

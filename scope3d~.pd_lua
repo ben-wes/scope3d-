@@ -203,7 +203,7 @@ function scope3d:pd_yrotate(x)
 end
 
 function scope3d:pd_rotate(x)
-  if type(x) == "table" and #x == 2 and
+  if #x == 2 and
      type(x[1]) == "number" and
      type(x[2]) == "number" then
     self.rotationAngleX, self.rotationAngleY = x[1], x[2]
@@ -269,7 +269,8 @@ function scope3d:pd_framerate(x)
 end
 
 function scope3d:pd_fgcolor(x)
-  if type(x) == "table" and #x == 3 and
+  if #x == 1 then x = {x[1], x[1], x[1]} end
+  if #x == 3 and
      type(x[1]) == "number" and
      type(x[2]) == "number" and
      type(x[3]) == "number" then
@@ -278,7 +279,8 @@ function scope3d:pd_fgcolor(x)
 end
 
 function scope3d:pd_bgcolor(x)
-  if type(x) == "table" and #x == 3 and
+  if #x == 1 then x = {x[1], x[1], x[1]} end
+  if #x == 3 and
      type(x[1]) == "number" and
      type(x[2]) == "number" and
      type(x[3]) == "number" then
@@ -287,7 +289,8 @@ function scope3d:pd_bgcolor(x)
 end
 
 function scope3d:pd_gridcolor(x)
-  if type(x) == "table" and #x == 3 and
+  if #x == 1 then x = {x[1], x[1], x[1]} end
+  if #x == 3 and
      type(x[1]) == "number" and
      type(x[2]) == "number" and
      type(x[3]) == "number" then
