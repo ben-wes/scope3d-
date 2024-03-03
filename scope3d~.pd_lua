@@ -26,8 +26,9 @@ function scope3d:reset()
   self.DRAW_GRID = 1
   self.STROKE_WIDTH = 1
   self.ZOOM = 1
-  self.COLOR = {Colors.foreground}
-  self.BACKGROUND = {Colors.background}
+  self.FGCOLOR = {Colors.foreground}
+  self.BGCOLOR = {Colors.background}
+  self.GRIDCOLOR = {192, 192, 192}
   self.PERSPECTIVE = 1
   self.rotationAngleX, self.rotationAngleY = 0, 0
   self.rotationStartAngleX, self.rotationStartAngleY = 0, 0
@@ -94,12 +95,12 @@ function scope3d:perform(in1, in2, in3)
 end
 
 function scope3d:paint(g)
-  g.set_color(table.unpack(self.BACKGROUND))
+  g.set_color(table.unpack(self.BGCOLOR))
   g.fill_all()
 
   -- draw ground grid
   if self.DRAW_GRID == 1 then
-    g.set_color(192, 192, 192)
+    g.set_color(table.unpack(self.GRIDCOLOR))
     for i = 1, #self.gridLines do
       local lineFrom, lineTo = table.unpack(self.gridLines[i])
       
@@ -123,7 +124,7 @@ function scope3d:paint(g)
     self.rotatedSignal[i] = self:rotate_x(rotatedVertex, self.rotationAngleX)
   end
 
-  g.set_color(table.unpack(self.COLOR))
+  g.set_color(table.unpack(self.FGCOLOR))
   local p = path.start(self:projectVertex(self.rotatedSignal[1], self.ZOOM))
   for i = 2, self.BUFFERSIZE do
     p:line_to(self:projectVertex(self.rotatedSignal[i], self.ZOOM))
@@ -157,19 +158,51 @@ function scope3d:projectVertex(vertex)
   return screenX, screenY
 end
 
-function scope3d:in_4_rotatex(x)
+function scope3d:in_n(n, sel, atoms)
+  local methods =
+  {
+    rotate      = function(s, a) return s:pd_rotate(a)      end,
+    xrotate     = function(s, a) return s:pd_xrotate(a)     end,
+    yrotate     = function(s, a) return s:pd_yrotate(a)     end,
+
+    size        = function(s, a) return s:pd_size(a)        end,
+    width       = function(s, a) return s:pd_width(a)       end,
+    height      = function(s, a) return s:pd_height(a)      end,
+
+    zoom        = function(s, a) return s:pd_zoom(a)        end,
+    grid        = function(s, a) return s:pd_grid(a)        end,
+    perspective = function(s, a) return s:pd_perspective(a) end,
+    stroke      = function(s, a) return s:pd_stroke(a)      end,
+
+    buffer      = function(s, a) return s:pd_buffer(a)      end,
+    interval    = function(s, a) return s:pd_interval(a)    end,
+    framerate   = function(s, a) return s:pd_framerate(a)   end,
+
+    fgcolor     = function(s, a) return s:pd_fgcolor(a)     end,
+    bgcolor     = function(s, a) return s:pd_bgcolor(a)     end,
+    gridcolor   = function(s, a) return s:pd_gridcolor(a)   end,
+
+    reset       = function(s, a) return s:reset(a)          end
+  }
+  local func = methods[sel]
+  if(func) then
+    func(self, atoms)
+  end
+end
+
+function scope3d:pd_xrotate(x)
   if type(x[1]) == "number" then
     self.rotationAngleX = x[1]
   end
 end
 
-function scope3d:in_4_rotatey(x)
+function scope3d:pd_yrotate(x)
   if type(x[1]) == "number" then
     self.rotationAngleY = x[1]
   end
 end
 
-function scope3d:in_4_rotate(x)
+function scope3d:pd_rotate(x)
   if type(x) == "table" and #x == 2 and
      type(x[1]) == "number" and
      type(x[2]) == "number" then
@@ -177,15 +210,15 @@ function scope3d:in_4_rotate(x)
   end
 end
 
-function scope3d:in_4_zoom(x)
+function scope3d:pd_zoom(x)
   self.ZOOM = type(x[1]) == "number" and x[1] or 1
 end
 
-function scope3d:in_4_grid(x)
+function scope3d:pd_grid(x)
   self.DRAW_GRID = type(x[1]) == "number" and x[1] or 1 - self.DRAW_GRID
 end
 
-function scope3d:in_4_size(x)
+function scope3d:pd_size(x)
   if type(x[1]) == "number" then
     local size = math.max(1, x[1])
     self.WIDTH = size
@@ -194,65 +227,70 @@ function scope3d:in_4_size(x)
   end
 end
 
-function scope3d:in_4_width(x)
+function scope3d:pd_width(x)
   if type(x[1]) == "number" then
     self.WIDTH = math.max(1, x[1])
     self:set_size(self.WIDTH, self.HEIGHT)
   end
 end
 
-function scope3d:in_4_height(x)
+function scope3d:pd_height(x)
   if type(x[1]) == "number" then
     self.HEIGHT = math.max(1, x[1])
     self:set_size(self.WIDTH, self.HEIGHT)
   end
 end
 
-function scope3d:in_4_buffer(x)
+function scope3d:pd_buffer(x)
   if type(x[1]) == "number" then
     self.BUFFERSIZE = math.min(1024, math.max(2, math.floor(x[1])))
     self:reset_buffer()
   end
 end
 
-function scope3d:in_4_interval(x)
+function scope3d:pd_interval(x)
   if type(x[1]) == "number" then
     self.SAMPLING_INTERVAL = math.max(1, math.floor(x[1]))
   end
 end
 
-function scope3d:in_4_stroke(x)
+function scope3d:pd_stroke(x)
   self.STROKE_WIDTH = type(x[1]) == "number" and math.max(1, x[1]) or 1
 end
 
-function scope3d:in_4_perspective(x)
+function scope3d:pd_perspective(x)
   self.PERSPECTIVE = type(x[1]) == "number" and x[1] or 1
 end
 
-function scope3d:in_4_reset()
-  self:reset()
-end
-
-function scope3d:in_4_framerate(x)
+function scope3d:pd_framerate(x)
   if type(x[1]) == "number" then
     self.FRAMEINTERVAL = self:interval_from_fps(math.min(120, math.max(1, x[1])))
   end
 end
 
-function scope3d:in_4_color(x)
+function scope3d:pd_fgcolor(x)
   if type(x) == "table" and #x == 3 and
      type(x[1]) == "number" and
      type(x[2]) == "number" and
      type(x[3]) == "number" then
-    self.COLOR = {x[1], x[2], x[3]}
+    self.FGCOLOR = {x[1], x[2], x[3]}
   end
 end
 
-function scope3d:in_4_background(x)
+function scope3d:pd_bgcolor(x)
   if type(x) == "table" and #x == 3 and
      type(x[1]) == "number" and
      type(x[2]) == "number" and
      type(x[3]) == "number" then
-    self.BACKGROUND = {x[1], x[2], x[3]}
+    self.BGCOLOR = {x[1], x[2], x[3]}
+  end
+end
+
+function scope3d:pd_gridcolor(x)
+  if type(x) == "table" and #x == 3 and
+     type(x[1]) == "number" and
+     type(x[2]) == "number" and
+     type(x[3]) == "number" then
+    self.GRIDCOLOR = {x[1], x[2], x[3]}
   end
 end
