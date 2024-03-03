@@ -1,7 +1,6 @@
 local scope3d = pd.Class:new():register("scope3d~")
 
 function scope3d:initialize(sel, atoms)
-  self.FRAMEINTERVAL = self:interval_from_fps(50)
   self.inlets = {SIGNAL, SIGNAL, SIGNAL, DATA}
   self:reset()
   self.cameraDistance = 6
@@ -42,12 +41,14 @@ function scope3d:handle_args(atoms)
 end
 
 function scope3d:reset()
+  self.FRAMEINTERVAL = self:interval_from_fps(50)
   self.BUFFERSIZE = 512
   self.bufferIndex = 1
   self.sampleIndex = 1
   self:reset_buffer()
   self.SAMPLING_INTERVAL = 8
   self.DRAW_GRID = 1
+  self.DRAG = 1
   self.STROKE_WIDTH = 1
   self.ZOOM = 1
   self.FGCOLOR = {Colors.foreground}
@@ -92,16 +93,20 @@ function scope3d:create_grid(minVal, maxVal, step)
 end
 
 function scope3d:mouse_down(x, y)
-  self.dragStartX, self.dragStartY = x, y
+  if self.DRAG == 1 then self.dragStartX, self.dragStartY = x, y end
 end
 
 function scope3d:mouse_up(x, y)
-  self.rotationStartAngleX, self.rotationStartAngleY = self.rotationAngleX, self.rotationAngleY
+  if self.DRAG == 1 then 
+    self.rotationStartAngleX, self.rotationStartAngleY = self.rotationAngleX, self.rotationAngleY
+  end
 end
 
 function scope3d:mouse_drag(x, y)
-  self.rotationAngleY = self.rotationStartAngleY + ((x-self.dragStartX) / 2)
-  self.rotationAngleX = self.rotationStartAngleX - ((y-self.dragStartY) / 2)
+  if self.DRAG == 1 then 
+    self.rotationAngleY = self.rotationStartAngleY + ((x-self.dragStartX) / 2)
+    self.rotationAngleX = self.rotationStartAngleX - ((y-self.dragStartY) / 2)
+  end
 end
 
 function scope3d:dsp(samplerate, blocksize)
@@ -198,6 +203,7 @@ function scope3d:call_pd_method(sel, atoms)
     height      = function(s, a) return s:pd_height(a)      end,
 
     zoom        = function(s, a) return s:pd_zoom(a)        end,
+    drag        = function(s, a) return s:pd_drag(a)        end,
     grid        = function(s, a) return s:pd_grid(a)        end,
     perspective = function(s, a) return s:pd_perspective(a) end,
     stroke      = function(s, a) return s:pd_stroke(a)      end,
@@ -240,6 +246,10 @@ end
 
 function scope3d:pd_zoom(x)
   self.ZOOM = type(x[1]) == "number" and x[1] or 1
+end
+
+function scope3d:pd_drag(x)
+  self.DRAG = type(x[1]) == "number" and x[1] or 1 - self.DRAG
 end
 
 function scope3d:pd_grid(x)
